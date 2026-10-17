@@ -1,4 +1,4 @@
-# sdd-taskanalyzer
+# sdd-task-analyzer
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue) ![Tests](https://img.shields.io/badge/pytest-passing-brightgreen) ![Status](https://img.shields.io/badge/fase-2%20intermedi%C3%A1ria-orange)
 
@@ -8,7 +8,7 @@ guiado por especificação (SDD), código gerado com apoio de IA e validado por 
 ## Estrutura
 
 ```
-sdd-taskanalyzer/
+sdd-task-analyzer/
 ├── README.md               # Este arquivo
 ├── CONTEXT_RULES.md        # Regras de governança da IA
 ├── .gitignore
@@ -26,8 +26,8 @@ sdd-taskanalyzer/
 Requer Python 3.11+.
 
 ```bash
-git clone https://github.com/carlosEmanuelSS/sdd-taskanalyzer.git
-cd sdd-taskanalyzer
+git clone https://github.com/carlosEmanuelSS/sdd-task-analyzer.git
+cd sdd-task-analyzer
 python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
@@ -38,8 +38,8 @@ pytest -v                     # Test Harness
 No Google Colab:
 
 ```python
-!git clone https://github.com/carlosEmanuelSS/sdd-taskanalyzer.git
-%cd sdd-taskanalyzer
+!git clone https://github.com/carlosEmanuelSS/sdd-task-analyzer.git
+%cd sdd-task-analyzer
 !pip install -q -r requirements.txt
 !pytest -v
 ```
