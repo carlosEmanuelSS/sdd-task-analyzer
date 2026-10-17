@@ -50,23 +50,35 @@ No Google Colab:
 from src.task_analyzer import analyze_tasks, TaskValidationError
 
 tarefas = [
-    {"id": 1, "status": "concluida", "prioridade": "alta",
-     "data_criacao": "2026-03-01T08:00:00", "data_conclusao": "2026-03-01T12:00:00",
-     "data_prevista": "2026-03-01T10:00:00"},
-    {"id": 2, "status": "pendente", "prioridade": "baixa",
-     "data_criacao": "2026-03-02T08:00:00"},
+    {"id": 1, "titulo": "Configurar repositório", "prioridade": "ALTA",
+     "data_criacao": "2026-03-01T08:00:00", "data_limite": "2026-03-01T10:00:00",
+     "data_conclusao": "2026-03-01T12:00:00", "status": "CONCLUIDA"},
+    {"id": 2, "titulo": "Gravar vídeo", "prioridade": "BAIXA",
+     "data_criacao": "2026-03-02T08:00:00", "data_limite": "2026-03-03T08:00:00",
+     "data_conclusao": None, "status": "PENDENTE"},
 ]
-print(analyze_tasks(tarefas))
+
+try:
+    print(analyze_tasks(tarefas))
+except TaskValidationError as erro:
+    print(erro.code, erro.message)
 ```
+
+Códigos de erro: `INVALID_TASK_DATA`, `INVALID_PRIORITY`, `INVALID_DATE`, `DUPLICATE_TASK_ID`, `EMPTY_TASK_LIST`.
 
 ## Testes cobertos
 
-| Teste | Cenário |
+| Teste | Cenário de aceite |
 |---|---|
-| `test_cenario1_*` | Cenário 1 — totais, tempo médio geral e por prioridade, taxa de atraso |
-| `test_cenario2_conclusao_antes_da_criacao` | Cenário 2 — `TaskValidationError` para datas inconsistentes |
-| `test_borda_lista_vazia` / `test_borda_apenas_pendentes` | Casos de borda — médias retornam `0.0` |
-| `test_dados_invalidos_disparam_task_validation_error` | Validações das CONTEXT_RULES (status, prioridade, formato e fuso) |
+| `test_cenario1_*` | 1 — Tempo médio de conclusão (e totais) |
+| `test_cenario2_taxa_atraso` | 2 — Taxa de atraso |
+| `test_cenario3_indicadores_por_prioridade` | 3 — Indicadores por BAIXA, MEDIA e ALTA |
+| `test_cenario4_lista_vazia` | 4 — `EMPTY_TASK_LIST` |
+| `test_cenario5_dados_invalidos` | 5 — `INVALID_TASK_DATA` |
+| `test_cenario6_prioridade_invalida` | 6 — `INVALID_PRIORITY` |
+| `test_cenario7_id_duplicado` | 7 — `DUPLICATE_TASK_ID` |
+| `test_cenario8_*` | 8 — `INVALID_DATE` (inclui conclusão anterior à criação) |
+| `test_borda_*` | Casos de borda — só pendentes retorna `0.0`; saída sempre consistente |
 
 ## Fluxo de trabalho Git
 
@@ -74,6 +86,7 @@ print(analyze_tasks(tarefas))
 - `feature/sdd-specification` — especificação e regras de contexto
 - `feature/task-analyzer-impl` — implementação gerada via IA
 - `feature/test-harness` — suíte de testes
+- `feature/alinhamento-fase1` — alinhamento ao contrato da Fase 1
 
 Toda integração na `main` acontece por Pull Request revisado.
 
