@@ -1,0 +1,76 @@
+# Contrato SDD do TaskAnalyzer em formato estruturado.
+# Fonte da verdade: specs/system_design_document.pdf (Fase 1) e specs/task_analyzer_spec.md.
+# Qualquer mudança de comportamento deve ser refletida primeiro na especificação.
+
+modulo: TaskAnalyzer
+versao_contrato: "1.0"
+autor: Carlos Emanuel Santos da Silva
+
+interface:
+  funcao: "analyze_tasks(tasks: list[dict[str, Any]]) -> dict[str, Any]"
+  excecao: "TaskValidationError(ValueError) com atributo code"
+  arquivo: src/task_analyzer.py
+
+entrada:
+  tipo: lista de tarefas
+  campos:
+    id: {tipo: inteiro, obrigatorio: true, regra: unico na lista}
+    titulo: {tipo: texto, obrigatorio: true}
+    prioridade: {tipo: texto, obrigatorio: true, valores: [BAIXA, MEDIA, ALTA]}
+    data_criacao: {tipo: data/hora, obrigatorio: true, formato: "ISO 8601 sem fuso"}
+    data_limite: {tipo: data/hora, obrigatorio: true, formato: "ISO 8601 sem fuso"}
+    data_conclusao: {tipo: data/hora ou nulo, obrigatorio: true, formato: "ISO 8601 sem fuso"}
+    status: {tipo: texto, obrigatorio: true}
+
+saida:
+  total_tarefas: inteiro
+  total_concluidas: inteiro
+  total_pendentes: inteiro
+  tempo_medio_conclusao_horas: "float, 2 casas"
+  taxa_atraso_percentual: "float, 2 casas"
+  indicadores_por_prioridade:
+    chaves: [BAIXA, MEDIA, ALTA]
+    campos: [total, concluidas, tempo_medio_conclusao_horas, taxa_atraso_percentual]
+
+regras:
+  - A entrada deve ser uma lista de tarefas valida.
+  - Os dados devem ser validados antes dos calculos.
+  - Cada tarefa deve possuir um id unico.
+  - A prioridade deve ser BAIXA, MEDIA ou ALTA.
+  - Os campos de data devem possuir valores validos.
+  - Dados invalidos nao podem ser utilizados no calculo das metricas.
+  - Calculos dependentes de conclusao utilizam somente tarefas com data_conclusao.
+  - Uma lista vazia deve ser tratada de forma previsivel (EMPTY_TASK_LIST).
+  - Entradas invalidas devem gerar o codigo de erro correspondente.
+  - A estrutura de saida deve permanecer consistente.
+
+erros:
+  INVALID_TASK_DATA: Dados da tarefa nao seguem a estrutura definida
+  INVALID_PRIORITY: Prioridade nao permitida
+  INVALID_DATE: Data invalida (formato, fuso ou conclusao antes da criacao)
+  DUPLICATE_TASK_ID: Identificador duplicado
+  EMPTY_TASK_LIST: Lista de tarefas vazia
+
+cenarios_aceite:
+  - {id: 1, nome: Tempo medio de conclusao, testes: "test_cenario1_*"}
+  - {id: 2, nome: Taxa de atraso, testes: test_cenario2_taxa_atraso}
+  - {id: 3, nome: Indicadores por prioridade, testes: test_cenario3_indicadores_por_prioridade}
+  - {id: 4, nome: Lista vazia, erro: EMPTY_TASK_LIST, testes: test_cenario4_lista_vazia}
+  - {id: 5, nome: Dados invalidos, erro: INVALID_TASK_DATA, testes: test_cenario5_dados_invalidos}
+  - {id: 6, nome: Prioridade invalida, erro: INVALID_PRIORITY, testes: test_cenario6_prioridade_invalida}
+  - {id: 7, nome: Identificador duplicado, erro: DUPLICATE_TASK_ID, testes: test_cenario7_id_duplicado}
+  - {id: 8, nome: Data invalida, erro: INVALID_DATE, testes: "test_cenario8_*"}
+
+casos_borda:
+  - {nome: Lista apenas com pendentes retorna 0.0, testes: test_borda_apenas_pendentes}
+  - {nome: Estrutura de saida consistente, testes: test_borda_estrutura_de_saida_consistente}
+
+dependencias:
+  producao: []            # somente biblioteca padrao
+  testes: [pytest>=8.0]   # requirements.txt
+  pipeline: [bandit==1.9.4]  # somente no GitHub Actions (CONTEXT_RULES, secao 5)
+
+ambiente:
+  python: "3.11"
+  ci: GitHub Actions (ubuntu-latest)
+  container: python:3.11-slim
