@@ -59,3 +59,21 @@ primeiro na especificação.
 - Prevenção de divisão por zero: métricas sem base de cálculo retornam `0.0`.
 - Dependência autorizada: apenas `pytest` (ver `requirements.txt`); o código de produção usa só a biblioteca padrão.
 - Merge na `main` somente via Pull Request revisado e com 100% dos testes passando.
+
+## 5. Requisitos técnicos da Fase 3 (CI/CD, Docker e segurança)
+
+Incluídos a partir do enunciado da Etapa Final antes de qualquer arquivo novo ser criado.
+
+- Estrutura autorizada: `.github/workflows/ci.yml`, `Dockerfile`, `docker-compose.yml`,
+  `.dockerignore`, `specs/system_design_document.pdf` (documento da Fase 1) e
+  `specs/requirements.yaml` (contrato em formato estruturado).
+- Pipeline no GitHub Actions disparado por push e Pull Request nas branches `main` e `develop`,
+  em `ubuntu-latest` com Python 3.11, executando `pytest tests/test_harness.py -v`.
+- Contêiner a partir da imagem oficial `python:3.11-slim`, sem pacotes de sistema extras,
+  executando a suíte de testes como comando padrão e com usuário sem privilégios de root.
+- Ferramenta autorizada **somente no pipeline**: `bandit` (análise estática de segurança, SAST),
+  com versão fixada no workflow. Ela não entra no `requirements.txt` nem na imagem Docker.
+- O pipeline não pode ser enfraquecido para ficar verde: é proibido usar `continue-on-error`,
+  pular testes, reduzir a severidade do Bandit ou remover etapas que estejam falhando.
+- Nenhum segredo, token ou credencial em código, workflow, Dockerfile ou compose.
+- Merge na `main` somente com o check do CI aprovado.
